@@ -2,20 +2,21 @@
 #include <stdio.h>
 
 char* fgets(char* buf, int bufsz, FILE* f) {
-    char c;
+    int c;
     size_t pos = 0;
     
-    while ((c = getchar(f)) == 0) {
-        if (pos >= (bufsz - 1)) {
-            return buf;
-        }
-        buf[pos++] = c;
-        
-        if (c == '\n') {
-            return buf;
+    while ((c = fgetc(f)) != -1) {
+        buf[pos++] = (char)c;
+        if (c == '\n' ||
+           (pos >= (size_t)(bufsz - 1))) {
+            break;
         }
     }
     
-    // we should only reach this if an error occurs
-    return NULL;
+    if (pos == 0 && c == -1) {
+        return NULL;
+    }
+    
+    buf[pos] = '\0';
+    return buf;
 }

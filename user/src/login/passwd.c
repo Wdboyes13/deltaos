@@ -21,11 +21,9 @@ char* serialize_passwd(struct passwd* pwd) {
 
 // returns a malloc'd struct, free it!
 struct passwd* deserialize_passwd(char* str) {
-    size_t sz = 256 + 1 + 64;
-    
-    if (strlen(str) != sz) {
-        errno = EINVAL;
-        return NULL;
+    size_t len = strlen(str);
+    if (len > 0 && str[len - 1] == '\n') {
+        str[--len] = '\0';
     }
     
     char* delim = strchr(str, ',');
@@ -37,11 +35,20 @@ struct passwd* deserialize_passwd(char* str) {
     *delim = '\0';
     char* pwd_hash = delim + 1;
     
-    struct passwd* pwd = malloc(sz);
-    memset(pwd, 0x00, sz);
+    size_t username_len = strlen(str);
+    size_t hash_len = strlen(pwd_hash);
+    if (username_len > 256 || hash_len != 64) {
+        errno = EINVAL;
+        return NULL;
+    }
     
-    memcpy(pwd->username, str, strlen(str));
-    memcpy(pwd->pwd_hash, pwd_hash, strlen(pwd_hash));
+    struct passwd* pwd = calloc(1, sizeof(*pwd));
+    if (pwd == NULL) {
+        return NULL;
+    }
+    
+    memcpy(pwd->username, str, username_len + 1);
+    memcpy(pwd->pwd_hash, pwd_hash, hash_len + 1);
     
     return pwd;
 }
