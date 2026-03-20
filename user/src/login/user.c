@@ -7,7 +7,7 @@
 #include "passwd.h"
 #include "sha256.h"
 
-int create_user(char* username, char* pt_pwd) {
+int create_user(const char* username, const char* pt_pwd) {
     struct passwd* pwd;
 
     size_t usrname_len = strlen(username);
@@ -48,9 +48,6 @@ struct passwd* get_user(const char* username) {
         return NULL;
     }
     
-    // TODO: loop through lines, deserializing each
-    // if we hit a matching username, return that one
-    
     const size_t line_sz = 256 + 1 + 64 + 1; // usrname + delim + pwdhash + null ending / newline
     
     char line[line_sz];
@@ -68,7 +65,7 @@ struct passwd* get_user(const char* username) {
     return NULL;
 }
 
-enum verif_stat verify_user(char* username, char* pt_pwd) {
+enum verif_stat verify_user(const char* username, const char* pt_pwd) {
     enum verif_stat code;
     
     struct passwd* passwd = get_user(username);

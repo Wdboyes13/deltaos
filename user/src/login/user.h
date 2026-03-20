@@ -3,9 +3,8 @@
 
 #include "passwd.h"
 
-// -1 = error
-// 0 = success
-int create_user(char* usrname, char* pwd);
+int create_user(const char* usrname, const char* pwd);
+struct passwd* get_user(const char* username);
 
 enum verif_stat {
     EWPWD, // wrong password
@@ -14,6 +13,6 @@ enum verif_stat {
     VALID // valid login
 };
 
-enum verif_stat verify_user(char* usr, char* pwd);
+enum verif_stat verify_user(const char* usr, const char* pwd);
 
 #endif
