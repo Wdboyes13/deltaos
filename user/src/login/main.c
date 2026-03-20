@@ -2,15 +2,19 @@
 #include <system.h>
 #include "user.h"
 #include <keyboard.h>
+#include <stdlib.h>
 
 int main(void) {
     if (kbd_init() < 0) return 1;
     
     // default root password, can change lol
-    if (get_user("root") == NULL) {
+    struct passwd* root = get_user("root");
+    if (root == NULL) {
         if (create_user("root", "toor") < 0) {
             puts("Failed to create root user\n");
         }
+    } else {
+        free(root);
     }
     
     while (1) {

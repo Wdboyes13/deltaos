@@ -26,18 +26,18 @@ int create_user(const char* username, const char* pt_pwd) {
     sha256_to_hex(shabuf, pwd.pwd_hash);
     
     struct stat st;
-    if (stat("/etc/passwd", &st) < 0) {
-        if (stat("/etc", &st) < 0) {
-            if (mkdir("etc") < 0) {
+    if (stat("/conf/passwd", &st) < 0) {
+        if (stat("/conf", &st) < 0) {
+            if (mkdir("conf") < 0) {
                 return -1;
             }
         }
-        if (mkfile("etc/passwd") < 0) {
+        if (mkfile("conf/passwd") < 0) {
             return -1;
         }
     }
     
-    FILE* passwd = fopen("/etc/passwd", "aw");
+    FILE* passwd = fopen("/conf/passwd", "aw");
     if (passwd == NULL) {
         return -1;
     }
@@ -61,7 +61,7 @@ int create_user(const char* username, const char* pt_pwd) {
 
 // the struct returnd will be malloc'd, free it when your done!
 struct passwd* get_user(const char* username) {
-    FILE* passwd = fopen("/etc/passwd", "r");
+    FILE* passwd = fopen("/conf/passwd", "r");
     if (passwd == NULL) {
         return NULL;
     }
@@ -91,12 +91,12 @@ enum verif_stat verify_user(const char* username, const char* pt_pwd) {
     
     struct passwd* passwd = get_user(username);
     if (passwd == NULL) {
-        return V_ENUSR; // its possible this was also an internal error, such as failing to open /etc/passwd
+        return V_ENUSR; // its possible this was also an internal error, such as failing to open /conf/passwd
             // we should later make it so in that case, EINTR is actually returned, not ENUSR
     }
     
-    uint8_t shabuf[32];
-    char shahex[65];
+    uint8_t shabuf[32] = {0};
+    char shahex[65] = {0};
     sha256(pt_pwd, strlen(pt_pwd), shabuf);
     sha256_to_hex(shabuf, shahex);
     
